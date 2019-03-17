@@ -1,9 +1,8 @@
 ---
 title: "QuizletExtractor"
 author: "Swati Singh"
-output:
-  html_document:
-    df_print: paged
+output: pdf_document
+classoption: landscape
 ---
 
 ```{r}
