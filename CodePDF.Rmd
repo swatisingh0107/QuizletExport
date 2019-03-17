@@ -1,0 +1,63 @@
+---
+title: "QuizletExtractor"
+author: "Swati Singh"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+#install.packages('rvest')
+#install.packages('xlsx')
+```
+
+Provide the links of quizlet sources from where the questions have to be extracted.
+The links below are for various questions for Test bank  70-410 Server Administration
+
+```{r message=FALSE}
+library('rvest')
+library('dplyr')
+url<-c('https://quizlet.com/71711574/70-410-test-bank-lesson-1-installing-servers-flash-cards/',
+       'https://quizlet.com/71710002/70-410-test-bank-lesson-2-configuring-servers-flash-cards/',
+       'https://quizlet.com/71708757/70-410-test-bank-lesson-3-configuring-local-storage-flash-cards/',
+       'https://quizlet.com/71707503/70-410-test-bank-lesson-4-configuring-file-and-share-access-flash-cards/',
+       'https://quizlet.com/71706148/70-410-test-bank-lesson-5-configuring-print-and-document-services-flash-cards/',
+       'https://quizlet.com/71703946/70-410-test-bank-lesson-6-configuring-servers-for-remote-management-flash-cards/',
+       'https://quizlet.com/71690345/70-410-test-bank-lesson-10-configuring-ipv4-and-ipv6-addressing-flash-cards/',
+       'https://quizlet.com/72649593/lesson-11-deploying-and-configuring-dhcp-service-flash-cards/',
+       'https://quizlet.com/72655902/lesson-12-deploying-and-configuring-dns-service-flash-cards/',
+       'https://quizlet.com/72657397/lesson-13-installing-domain-controllers-flash-cards/',
+       'https://quizlet.com/73685180/lesson-14-creating-and-managing-active-directory-users-and-computers-flash-cards/',
+       'https://quizlet.com/73682234/lesson-15-creating-and-managing-active-directory-groups-and-organizational-units-flash-cards/',
+       'https://quizlet.com/73690786/lesson-16-creating-group-policy-objects-flash-cards/',
+       'https://quizlet.com/74316581/major-exam-2-flash-cards/',
+       'https://quizlet.com/78867114/major-exam-3-flash-cards/',
+       'https://quizlet.com/82897690/major-exam-4-flash-cards/'
+)
+#Number of source links
+n<-length(url)
+n
+```
+The following for loop extracts the questions and the answers from each link provided 
+```{r warning=FALSE}
+ques_bank<-data.frame()
+row.names(ques_bank)<-NULL
+for (i in 1:n){
+  page<-read_html(url[i])
+  currentpage<-data.frame(Question<-html_text(html_nodes(page,".SetPageTerm-wordText")),
+                      Ans<-html_text(html_nodes(page,".SetPageTerm-definitionText")))
+  ques_bank<-bind_rows(ques_bank,currentpage)
+}
+```
+
+
+```{r}
+names(ques_bank)<-c("Question","Answer")
+head(ques_bank,row.names=NULL)
+```
+
+
+```{r}
+library('xlsx')
+write.xlsx(ques_bank, file="quizlet.xlsx",col.names = TRUE, row.names = FALSE, append = FALSE)
+```
